@@ -2,7 +2,7 @@ export const PLAYER_CONFIG = {
   /** 충돌 판정 반지름(px) */
   radius: 14,
   /** 스프라이트 표시 지름(px), 충돌 판정과 별개 */
-  spriteDiameter: 52,
+  spriteDiameter: 104,
   /** 이동 속도 (px/s) */
   moveSpeed: 220,
   /** 최대 체력 */
