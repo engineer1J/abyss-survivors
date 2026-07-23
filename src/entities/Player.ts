@@ -14,9 +14,8 @@ export class Player extends Phaser.GameObjects.Sprite {
     this.maxHp = PLAYER_CONFIG.maxHp;
     this.hp = this.maxHp;
 
-    // 예전 원(Arc)과 비슷한 크기로 보이도록 반지름*2를 스프라이트의 긴 변에 맞춰 스케일
-    const targetDiameter = PLAYER_CONFIG.radius * 2;
-    this.setScale(targetDiameter / Math.max(this.width, this.height));
+    // 시각 크기(spriteDiameter)는 충돌 판정 radius와 무관하게 별도로 설정됨
+    this.setScale(PLAYER_CONFIG.spriteDiameter / Math.max(this.width, this.height));
 
     scene.add.existing(this);
   }
