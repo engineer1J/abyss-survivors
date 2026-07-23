@@ -1,16 +1,23 @@
 import Phaser from "phaser";
 import { PLAYER_CONFIG } from "../data/playerConfig";
 
-export class Player extends Phaser.GameObjects.Arc {
+export class Player extends Phaser.GameObjects.Sprite {
+  static readonly textureKey = "player";
+
   hp: number;
   readonly maxHp: number;
   exp = 0;
   private invulnerableUntil = 0;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, PLAYER_CONFIG.radius, 0, 360, false, PLAYER_CONFIG.color);
+    super(scene, x, y, Player.textureKey);
     this.maxHp = PLAYER_CONFIG.maxHp;
     this.hp = this.maxHp;
+
+    // 예전 원(Arc)과 비슷한 크기로 보이도록 반지름*2를 스프라이트의 긴 변에 맞춰 스케일
+    const targetDiameter = PLAYER_CONFIG.radius * 2;
+    this.setScale(targetDiameter / Math.max(this.width, this.height));
+
     scene.add.existing(this);
   }
 

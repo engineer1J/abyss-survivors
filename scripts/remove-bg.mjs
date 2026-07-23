@@ -113,7 +113,10 @@ async function removeWhiteBackground(inFile, outFile) {
   }
 
   fs.mkdirSync(path.dirname(outFile), { recursive: true });
-  await sharp(data, { raw: { width, height, channels } }).png().toFile(outFile);
+  await sharp(data, { raw: { width, height, channels } })
+    .trim({ threshold: 10 }) // 투명해진 배경 여백 제거, 캐릭터에 맞춰 타이트하게 크롭
+    .png()
+    .toFile(outFile);
 }
 
 removeWhiteBackground(inputPath, outputPath)

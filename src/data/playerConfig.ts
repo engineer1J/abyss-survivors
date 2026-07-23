@@ -1,8 +1,6 @@
 export const PLAYER_CONFIG = {
-  /** 원 반지름(px) */
+  /** 충돌 판정 반지름(px) */
   radius: 14,
-  /** 도형 색상 */
-  color: 0x4fd1c5,
   /** 이동 속도 (px/s) */
   moveSpeed: 220,
   /** 최대 체력 */

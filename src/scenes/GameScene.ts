@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import playerSpriteUrl from "../../assets/sprites/player.png";
 import { PLAYER_CONFIG } from "../data/playerConfig";
 import { ENEMY_CONFIG } from "../data/enemyConfig";
 import { AUTO_WEAPON_CONFIG } from "../data/weaponConfig";
@@ -37,6 +38,10 @@ export class GameScene extends Phaser.Scene {
 
   constructor() {
     super("GameScene");
+  }
+
+  preload(): void {
+    this.load.image(Player.textureKey, playerSpriteUrl);
   }
 
   create(): void {
