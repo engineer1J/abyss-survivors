@@ -41,7 +41,7 @@ export const ENEMY_KINDS: readonly EnemyKindConfig[] = [
     textureKey: "enemy_angler",
     spawnWeight: 3,
     radius: 16,
-    spriteDiameter: 96,
+    spriteDiameter: 115, // 96 * 1.2
     moveSpeed: 175,
     maxHp: 35,
     contactDamage: 14,
@@ -53,7 +53,7 @@ export const ENEMY_KINDS: readonly EnemyKindConfig[] = [
     textureKey: "enemy_tentacle",
     spawnWeight: 5,
     radius: 18,
-    spriteDiameter: 108,
+    spriteDiameter: 162, // 108 * 1.5
     moveSpeed: 55,
     maxHp: 25,
     contactDamage: 8,
