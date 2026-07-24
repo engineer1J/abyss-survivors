@@ -10,8 +10,12 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
 
-const inputPath = path.join(projectRoot, "assets/raw/player_ref.png");
-const outputPath = path.join(projectRoot, "assets/sprites/player.png");
+const TARGETS = [
+  { input: "assets/raw/player_ref.png", output: "assets/sprites/player.png" },
+  { input: "assets/raw/enemy_angler_ref.png", output: "assets/sprites/enemy_angler.png" },
+  { input: "assets/raw/enemy_tentacle_ref.png", output: "assets/sprites/enemy_tentacle.png" },
+  { input: "assets/raw/enemy_jellyfish_ref.png", output: "assets/sprites/enemy_jellyfish.png" },
+];
 
 const WHITE_THRESHOLD = 245; // 이 값 이상이면 "배경 흰색" 후보로 취급
 const FEATHER_THRESHOLD = 200; // 이 값 이상~WHITE_THRESHOLD 미만이면 경계에서 알파를 부드럽게 감쇠
@@ -119,11 +123,16 @@ async function removeWhiteBackground(inFile, outFile) {
     .toFile(outFile);
 }
 
-removeWhiteBackground(inputPath, outputPath)
-  .then(() => {
-    console.log(`Saved: ${outputPath}`);
-  })
-  .catch((err) => {
-    console.error(err);
-    process.exit(1);
-  });
+async function run() {
+  for (const { input, output } of TARGETS) {
+    const inFile = path.join(projectRoot, input);
+    const outFile = path.join(projectRoot, output);
+    await removeWhiteBackground(inFile, outFile);
+    console.log(`Saved: ${outFile}`);
+  }
+}
+
+run().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

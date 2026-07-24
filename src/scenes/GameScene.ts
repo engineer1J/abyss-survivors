@@ -1,7 +1,10 @@
 import Phaser from "phaser";
 import playerSpriteUrl from "../../assets/sprites/player.png";
+import enemyAnglerSpriteUrl from "../../assets/sprites/enemy_angler.png";
+import enemyTentacleSpriteUrl from "../../assets/sprites/enemy_tentacle.png";
+import enemyJellyfishSpriteUrl from "../../assets/sprites/enemy_jellyfish.png";
 import { PLAYER_CONFIG } from "../data/playerConfig";
-import { ENEMY_CONFIG } from "../data/enemyConfig";
+import { ENEMY_CONFIG, ENEMY_KINDS, type EnemyKindConfig } from "../data/enemyConfig";
 import { AUTO_WEAPON_CONFIG } from "../data/weaponConfig";
 import { GEM_CONFIG } from "../data/gemConfig";
 import { HUD_CONFIG } from "../data/hudConfig";
@@ -19,6 +22,12 @@ interface WasdKeys {
 }
 
 const WORLD_GRID_SIZE = 20000;
+
+const ENEMY_SPRITE_URLS: Record<string, string> = {
+  enemy_angler: enemyAnglerSpriteUrl,
+  enemy_tentacle: enemyTentacleSpriteUrl,
+  enemy_jellyfish: enemyJellyfishSpriteUrl,
+};
 
 export class GameScene extends Phaser.Scene {
   private player!: Player;
@@ -42,6 +51,9 @@ export class GameScene extends Phaser.Scene {
 
   preload(): void {
     this.load.image(Player.textureKey, playerSpriteUrl);
+    for (const kind of ENEMY_KINDS) {
+      this.load.image(kind.textureKey, ENEMY_SPRITE_URLS[kind.textureKey]);
+    }
   }
 
   create(): void {
@@ -168,10 +180,13 @@ export class GameScene extends Phaser.Scene {
       const dy = this.player.y - enemy.y;
       const dist = Math.hypot(dx, dy) || 1;
 
-      enemy.x += (dx / dist) * enemy.speed * dt;
-      enemy.y += (dy / dist) * enemy.speed * dt;
+      // 원거리 부유형: 선호 거리 안으로는 접근하지 않고 그 자리에서 맴돈다
+      if (dist > enemy.preferredDistance) {
+        enemy.x += (dx / dist) * enemy.speed * dt;
+        enemy.y += (dy / dist) * enemy.speed * dt;
+      }
 
-      if (dist <= PLAYER_CONFIG.radius + ENEMY_CONFIG.radius) {
+      if (dist <= PLAYER_CONFIG.radius + enemy.radius) {
         this.player.takeDamage(enemy.contactDamage);
       }
     }
@@ -191,7 +206,7 @@ export class GameScene extends Phaser.Scene {
         if (!enemy.active) continue;
 
         const dist = Phaser.Math.Distance.Between(projectile.x, projectile.y, enemy.x, enemy.y);
-        if (dist <= AUTO_WEAPON_CONFIG.projectileRadius + ENEMY_CONFIG.radius) {
+        if (dist <= AUTO_WEAPON_CONFIG.projectileRadius + enemy.radius) {
           this.projectilePool.release(projectile);
           const died = enemy.takeDamage(projectile.damage);
           if (died) this.killEnemy(enemy);
@@ -247,7 +262,18 @@ export class GameScene extends Phaser.Scene {
     const x = this.player.x + Math.cos(angle) * viewRadius;
     const y = this.player.y + Math.sin(angle) * viewRadius;
 
-    this.enemyPool.acquire().spawn(x, y);
+    this.enemyPool.acquire().spawn(x, y, this.pickEnemyKind());
+  }
+
+  private pickEnemyKind(): EnemyKindConfig {
+    const totalWeight = ENEMY_KINDS.reduce((sum, kind) => sum + kind.spawnWeight, 0);
+    let roll = Phaser.Math.FloatBetween(0, totalWeight);
+
+    for (const kind of ENEMY_KINDS) {
+      roll -= kind.spawnWeight;
+      if (roll <= 0) return kind;
+    }
+    return ENEMY_KINDS[ENEMY_KINDS.length - 1];
   }
 
   private fireWeaponAtNearestEnemy(): void {

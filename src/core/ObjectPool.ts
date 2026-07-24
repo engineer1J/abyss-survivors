@@ -4,7 +4,7 @@ import Phaser from "phaser";
  * 고정 크기로 미리 생성한 도형 오브젝트를 재사용하는 풀.
  * acquire/release만으로 순환하며, 게임 도중 GameObject를 새로 생성/파괴하지 않는다.
  */
-export class ObjectPool<T extends Phaser.GameObjects.Arc> {
+export class ObjectPool<T extends Phaser.GameObjects.GameObject & { setVisible(value: boolean): unknown }> {
   private readonly free: T[] = [];
   private readonly activeList: T[] = [];
 
